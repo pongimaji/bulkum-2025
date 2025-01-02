@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rute Bulkum 2025</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css" />
+    <style>
+        #map { height: 500px; border-radius: 8px; margin-top: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">Rute Bulkum 2025</h1>
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                <div id="map"></div>
+            </div>
+        </div>
+        <div class="row justify-content-center mt-4">
+            <div class="col-md-10">
+                <ul class="list-group" id="location-list"></ul>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+    <script>
+        const map = L.map('map').setView([-6.200000, 106.816666], 10);
+        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+            maxZoom: 18,
+            attribution: '© OpenStreetMap contributors'
+        }).addTo(map);
+
+        fetch('locations.json')
+            .then(response => response.json())
+            .then(locations => {
+                const locationList = document.getElementById('location-list');
+                locations.forEach(location => {
+                    const marker = L.marker(location.coords).addTo(map)
+                        .bindPopup(`<b>${location.name}</b><br>Coordinates: ${location.coords[0]}, ${location.coords[1]}`)
+                        .openPopup();
+
+                    const listItem = document.createElement('li');
+                    listItem.className = 'list-group-item';
+                    listItem.innerHTML = `<strong>${location.name}</strong><br>Link Map: <a href="${location.url}" target="_BLANK">${location.url}</a>`;
+                    listItem.addEventListener('click', () => {
+                        map.setView(location.coords, 13);
+                        marker.openPopup();
+                    });
+                    locationList.appendChild(listItem);
+                });
+            });
+    </script>
+</body>
+</html>
